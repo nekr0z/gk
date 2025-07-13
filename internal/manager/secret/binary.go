@@ -7,7 +7,8 @@ type Binary []byte
 func NewBinary(value []byte) Secret {
 	v := Binary(value)
 	return Secret{
-		secret: &v,
+		secret:   &v,
+		metadata: make(map[string]string),
 	}
 }
 

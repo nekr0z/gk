@@ -19,6 +19,7 @@ func NewCard(number, expiry, cvv string) Secret {
 			Expiry: expiry,
 			CVV:    cvv,
 		},
+		metadata: make(map[string]string),
 	}
 }
 

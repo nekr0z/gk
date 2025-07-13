@@ -88,3 +88,31 @@ func TestCard(t *testing.T) {
 	assert.Equal(t, "12/22", c.Expiry)
 	assert.Equal(t, "123", c.CVV)
 }
+
+func TestMetadate(t *testing.T) {
+	t.Parallel()
+
+	s := secret.NewText("")
+	s.SetMetadataValue("key", "value")
+
+	data := s.Marshal()
+	assert.NotEmpty(t, data)
+
+	unmarshaled, err := secret.Unmarshal(data)
+	require.NoError(t, err)
+
+	k, ok := unmarshaled.GetMetadataValue("key")
+	assert.True(t, ok)
+	assert.Equal(t, "value", k)
+
+	k, ok = unmarshaled.GetMetadataValue("key2")
+	assert.False(t, ok)
+	assert.Empty(t, k)
+
+	s2 := secret.NewBinary(nil)
+	s2.SetMetadata(unmarshaled.Metadata())
+
+	k, ok = s2.GetMetadataValue("key")
+	assert.True(t, ok)
+	assert.Equal(t, "value", k)
+}

@@ -7,7 +7,8 @@ type Text string
 func NewText(value string) Secret {
 	v := Text(value)
 	return Secret{
-		secret: &v,
+		secret:   &v,
+		metadata: make(map[string]string),
 	}
 }
 

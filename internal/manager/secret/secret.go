@@ -81,3 +81,24 @@ func Unmarshal(data []byte) (Secret, error) {
 func (s Secret) Value() secret {
 	return s.secret
 }
+
+// Metadata returns the metadata of the secret.
+func (s Secret) Metadata() map[string]string {
+	return s.metadata
+}
+
+// SetMetadata sets the metadata of the secret.
+func (s *Secret) SetMetadata(metadata map[string]string) {
+	s.metadata = metadata
+}
+
+// SetMetadataValue sets a particular metadata value of the secret.
+func (s *Secret) SetMetadataValue(key, value string) {
+	s.metadata[key] = value
+}
+
+// GetMetadataValue gets a particular metadata value of the secret.
+func (s *Secret) GetMetadataValue(key string) (string, bool) {
+	v, ok := s.metadata[key]
+	return v, ok
+}

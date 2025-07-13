@@ -15,7 +15,8 @@ func NewPassword(username, password string) Secret {
 		Password: password,
 	}
 	return Secret{
-		secret: &v,
+		secret:   &v,
+		metadata: make(map[string]string),
 	}
 }
 
