@@ -25,7 +25,7 @@ type Data struct {
 
 // UnencryptedData is a piece of unencrypted data.
 type UnencryptedData interface {
-	Payload() []byte
+	Marshal() []byte
 }
 
 // Encrypt encrypts the data.
@@ -47,7 +47,7 @@ func Encrypt(in UnencryptedData, passPhrase string) (Data, error) {
 
 	salt = append(salt, nonce...)
 
-	encryptedData := append(salt, gcm.Seal(nil, nonce, in.Payload(), nil)...)
+	encryptedData := append(salt, gcm.Seal(nil, nonce, in.Marshal(), nil)...)
 
 	hash := sha256.Sum256(encryptedData)
 

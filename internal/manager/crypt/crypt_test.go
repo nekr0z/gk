@@ -57,7 +57,7 @@ func TestDecrypt_Success(t *testing.T) {
 	decrypted, err := Decrypt(encrypted, passPhrase)
 	assert.NoError(t, err)
 
-	assert.Equal(t, data.Payload(), decrypted)
+	assert.Equal(t, data.Marshal(), decrypted)
 }
 
 func TestDecrypt_WrongPassphrase(t *testing.T) {
@@ -95,7 +95,7 @@ func TestDecrypt_TamperedHash(t *testing.T) {
 
 type mockUnencryptedData string
 
-func (m mockUnencryptedData) Payload() []byte {
+func (m mockUnencryptedData) Marshal() []byte {
 	return []byte(m)
 }
 
