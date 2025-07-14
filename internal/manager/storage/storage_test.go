@@ -10,7 +10,6 @@ import (
 
 	"github.com/nekr0z/gk/internal/manager/secret"
 	"github.com/nekr0z/gk/internal/manager/storage"
-	secretstorage "github.com/nekr0z/gk/internal/storage"
 )
 
 func TestStorage(t *testing.T) {
@@ -54,17 +53,17 @@ func TestStorage(t *testing.T) {
 	assert.Error(t, err)
 }
 
-type mockStorage map[string]secretstorage.Secret
+type mockStorage map[string]storage.StoredSecret
 
-func (m mockStorage) Get(_ context.Context, key string) (secretstorage.Secret, error) {
+func (m mockStorage) Get(_ context.Context, key string) (storage.StoredSecret, error) {
 	value, ok := m[key]
 	if !ok {
-		return secretstorage.Secret{}, errors.New("not found")
+		return storage.StoredSecret{}, errors.New("not found")
 	}
 	return value, nil
 }
 
-func (m mockStorage) Put(_ context.Context, key string, value secretstorage.Secret) error {
+func (m mockStorage) Put(_ context.Context, key string, value storage.StoredSecret) error {
 	m[key] = value
 	return nil
 }

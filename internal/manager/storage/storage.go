@@ -7,17 +7,16 @@ import (
 
 	"github.com/nekr0z/gk/internal/manager/crypt"
 	"github.com/nekr0z/gk/internal/manager/secret"
-	"github.com/nekr0z/gk/internal/storage"
 )
 
 // Repository stores secrets.
 type Repository struct {
-	storage    storage.Storage
+	storage    Storage
 	passPhrase string
 }
 
 // New creates a new repository.
-func New(storage storage.Storage, passPhrase string) *Repository {
+func New(storage Storage, passPhrase string) *Repository {
 	return &Repository{
 		storage:    storage,
 		passPhrase: passPhrase,
@@ -35,7 +34,7 @@ func (r *Repository) Create(ctx context.Context, key string, secret secret.Secre
 		return err
 	}
 
-	return r.storage.Put(ctx, key, storage.Secret{
+	return r.storage.Put(ctx, key, StoredSecret{
 		EncryptedPayload: encryptedPayload,
 	})
 }
@@ -66,4 +65,17 @@ func (r *Repository) Delete(ctx context.Context, key string) error {
 	}
 
 	return r.storage.Delete(ctx, key)
+}
+
+// Storage is a secrets storage.
+type Storage interface {
+	Get(context.Context, string) (StoredSecret, error)
+	Put(context.Context, string, StoredSecret) error
+	Delete(context.Context, string) error
+}
+
+// StoredSecret is a secret encrypted and stored.
+type StoredSecret struct {
+	EncryptedPayload    crypt.Data
+	LastKnownServerHash [32]byte
 }
