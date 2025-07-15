@@ -1,6 +1,9 @@
 package secret
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strings"
+)
 
 // Password is a plaintext secret value.
 type Password struct {
@@ -18,6 +21,18 @@ func NewPassword(username, password string) Secret {
 		secret:   &v,
 		metadata: make(map[string]string),
 	}
+}
+
+// String returns the string representation of the Password.
+func (p Password) String() string {
+	var sb strings.Builder
+	sb.WriteString("Username: ")
+	sb.WriteString(p.Username)
+	sb.WriteString("\n")
+	sb.WriteString("Password: ")
+	sb.WriteString(p.Password)
+
+	return sb.String()
 }
 
 func (p Password) typeMarker() byte {

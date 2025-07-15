@@ -17,6 +17,11 @@ func (b Binary) Bytes() []byte {
 	return []byte(b)
 }
 
+// String returns the string representation of the Binary.
+func (b Binary) String() string {
+	return "***BINARY DATA***"
+}
+
 func (b Binary) typeMarker() byte {
 	return 'b'
 }

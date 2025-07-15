@@ -48,6 +48,7 @@ func TestBinary(t *testing.T) {
 	got := v.(*secret.Binary)
 
 	assert.Equal(t, bin, got.Bytes())
+	assert.Contains(t, got.String(), "**BINARY DATA**")
 }
 
 func TestPassword(t *testing.T) {
@@ -68,12 +69,15 @@ func TestPassword(t *testing.T) {
 
 	assert.Equal(t, user, p.Username)
 	assert.Equal(t, pwd, p.Password)
+
+	assert.Contains(t, p.String(), "username@localhost")
+	assert.Contains(t, p.String(), "my secret password")
 }
 
 func TestCard(t *testing.T) {
 	t.Parallel()
 
-	card := secret.NewCard("1234 5678 9012 3456", "12/22", "123")
+	card := secret.NewCard("1234 5678 9012 3456", "12/22", "123", "Mr. White")
 
 	data := card.Marshal()
 	assert.NotEmpty(t, data)
@@ -87,9 +91,15 @@ func TestCard(t *testing.T) {
 	assert.Equal(t, "1234 5678 9012 3456", c.Number)
 	assert.Equal(t, "12/22", c.Expiry)
 	assert.Equal(t, "123", c.CVV)
+	assert.Equal(t, "Mr. White", c.Username)
+
+	assert.Contains(t, c.String(), "1234 5678 9012 3456")
+	assert.Contains(t, c.String(), "12/22")
+	assert.Contains(t, c.String(), "123")
+	assert.Contains(t, c.String(), "Mr. White")
 }
 
-func TestMetadate(t *testing.T) {
+func TestMetadata(t *testing.T) {
 	t.Parallel()
 
 	s := secret.NewText("")
