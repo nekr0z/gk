@@ -30,9 +30,40 @@ func TestSQLStorage(t *testing.T) {
 		LastKnownServerHash: [32]byte{1, 2, 3},
 	}
 
+	key2 := "test-key2"
+	payload = []byte("some-other-encrypted-data")
+	hash = sha256.Sum256(payload)
+	secret2 := storage.StoredSecret{
+		EncryptedPayload: crypt.Data{
+			Data: payload,
+			Hash: hash,
+		},
+		LastKnownServerHash: [32]byte{1, 2, 3, 4},
+	}
+
 	t.Run("PutNewSecret", func(t *testing.T) {
 		err := db.Put(ctx, key, secret)
 		assert.NoError(t, err, "Put failed")
+
+		err = db.Put(ctx, key2, secret2)
+		assert.NoError(t, err, "Put failed")
+	})
+
+	t.Run("ListSecrets", func(t *testing.T) {
+		secrets, err := db.List(ctx)
+		assert.NoError(t, err, "List failed")
+		assert.Len(t, secrets, 2, "Expected 2 secrets")
+
+		s1 := storage.ListedSecret{
+			Hash:                secret.EncryptedPayload.Hash,
+			LastKnownServerHash: secret.LastKnownServerHash,
+		}
+		s2 := storage.ListedSecret{
+			Hash:                secret2.EncryptedPayload.Hash,
+			LastKnownServerHash: secret2.LastKnownServerHash,
+		}
+		assert.Equal(t, secrets[key], s1, "Expected secret 1 to be in the list")
+		assert.Equal(t, secrets[key2], s2, "Expected secret 2 to be in the list")
 	})
 
 	t.Run("GetExistingSecret", func(t *testing.T) {

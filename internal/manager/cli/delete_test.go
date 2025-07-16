@@ -22,7 +22,8 @@ func TestDelete(t *testing.T) {
 	db, err := sqlite.New("file:" + dbFilename)
 	require.NoError(t, err)
 
-	repo := storage.New(db, passPhrase)
+	repo, err := storage.New(db, passPhrase)
+	require.NoError(t, err)
 
 	sec := secret.NewText("my secret note")
 	err = repo.Create(context.Background(), secretName, sec)

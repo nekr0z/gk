@@ -82,7 +82,5 @@ func initStorage(cmd *cobra.Command) (*storage.Repository, error) {
 		return db.Close()
 	}
 
-	repo := storage.New(db, viper.GetString("passphrase"))
-
-	return repo, nil
+	return storage.New(db, viper.GetString("passphrase"))
 }

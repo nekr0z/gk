@@ -26,7 +26,8 @@ func TestShow_Text(t *testing.T) {
 	db, err := sqlite.New("file:" + dbFilename)
 	require.NoError(t, err)
 
-	repo := storage.New(db, passPhrase)
+	repo, err := storage.New(db, passPhrase)
+	require.NoError(t, err)
 
 	sec := secret.NewText("my secret note")
 	sec.SetMetadataValue("key1", "value1")
@@ -83,7 +84,8 @@ func TestShow_Binary(t *testing.T) {
 	db, err := sqlite.New("file:" + dbFilename)
 	require.NoError(t, err)
 
-	repo := storage.New(db, passPhrase)
+	repo, err := storage.New(db, passPhrase)
+	require.NoError(t, err)
 
 	bin := make([]byte, 1024)
 	_, err = rand.Read(bin)

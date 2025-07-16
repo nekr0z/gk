@@ -34,6 +34,8 @@ const (
 	deleteQuery = `DELETE FROM ` + tableName + ` WHERE id = ?`
 )
 
+var _ storage.Storage = (*Storage)(nil)
+
 // Storage implements the storage.Storage interface using an SQL database.
 type Storage struct {
 	db *sql.DB
@@ -76,7 +78,7 @@ func (s *Storage) Get(ctx context.Context, key string) (storage.StoredSecret, er
 
 	if err := row.Scan(&encryptedPayload, &payloadHash, &serverHash); err != nil {
 		if err == sql.ErrNoRows {
-			return storage.StoredSecret{}, fmt.Errorf("secret not found")
+			return storage.StoredSecret{}, storage.ErrNotFound
 		}
 		return storage.StoredSecret{}, fmt.Errorf("failed to get secret: %w", err)
 	}
@@ -111,7 +113,38 @@ func (s *Storage) Delete(ctx context.Context, key string) error {
 	return err
 }
 
+// List retrieves a list of all secrets from the database.
+func (s *Storage) List(ctx context.Context) (map[string]storage.ListedSecret, error) {
+	rows, err := s.db.QueryContext(ctx, "SELECT id, payload_hash, server_hash FROM "+tableName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	secrets := make(map[string]storage.ListedSecret)
+	for rows.Next() {
+		var (
+			id          string
+			payloadHash []byte
+			serverHash  []byte
+		)
+		if err = rows.Scan(&id, &payloadHash, &serverHash); err != nil {
+			return nil, err
+		}
+		secrets[id] = storage.ListedSecret{
+			Hash:                toHashArray(payloadHash),
+			LastKnownServerHash: toHashArray(serverHash),
+		}
+	}
+
+	return secrets, nil
+}
+
 func toHashArray(b []byte) [32]byte {
+	if len(b) == 0 {
+		return [32]byte{}
+	}
+
 	if len(b) != 32 {
 		panic("invalid hash length")
 	}

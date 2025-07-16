@@ -33,7 +33,8 @@ func TestCreate_Text(t *testing.T) {
 	db, err := sqlite.New("file:" + dbFilename)
 	require.NoError(t, err)
 
-	repo := storage.New(db, passPhrase)
+	repo, err := storage.New(db, passPhrase)
+	require.NoError(t, err)
 
 	sec, err := repo.Read(context.Background(), secretName)
 	require.NoError(t, err)
@@ -72,7 +73,8 @@ func TestCreate_Binary(t *testing.T) {
 	db, err := sqlite.New("file:" + dbFilename)
 	require.NoError(t, err)
 
-	repo := storage.New(db, passPhrase)
+	repo, err := storage.New(db, passPhrase)
+	require.NoError(t, err)
 
 	sec, err := repo.Read(context.Background(), secretName)
 	require.NoError(t, err)
@@ -104,7 +106,8 @@ func TestCreate_Password(t *testing.T) {
 	db, err := sqlite.New("file:" + dbFilename)
 	require.NoError(t, err)
 
-	repo := storage.New(db, passPhrase)
+	repo, err := storage.New(db, passPhrase)
+	require.NoError(t, err)
 
 	sec, err := repo.Read(context.Background(), secretName)
 	require.NoError(t, err)
@@ -141,7 +144,8 @@ func TestCreate_Card(t *testing.T) {
 	db, err := sqlite.New("file:" + dbFilename)
 	require.NoError(t, err)
 
-	repo := storage.New(db, passPhrase)
+	repo, err := storage.New(db, passPhrase)
+	require.NoError(t, err)
 
 	sec, err := repo.Read(context.Background(), secretName)
 	require.NoError(t, err)

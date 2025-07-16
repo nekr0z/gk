@@ -15,7 +15,8 @@ import (
 func TestStorage(t *testing.T) {
 	store := mockStorage{}
 	passphrase := "password"
-	st := storage.New(store, passphrase)
+	st, err := storage.New(store, passphrase)
+	require.NoError(t, err)
 
 	note := "my note"
 	s := secret.NewText(note)
@@ -29,7 +30,7 @@ func TestStorage(t *testing.T) {
 
 	ctx := context.Background()
 
-	err := st.Create(ctx, key, s)
+	err = st.Create(ctx, key, s)
 	require.NoError(t, err)
 
 	bb := s.Marshal()
@@ -71,4 +72,8 @@ func (m mockStorage) Put(_ context.Context, key string, value storage.StoredSecr
 func (m mockStorage) Delete(_ context.Context, key string) error {
 	delete(m, key)
 	return nil
+}
+
+func (m mockStorage) List(_ context.Context) (map[string]storage.ListedSecret, error) {
+	return nil, nil
 }
