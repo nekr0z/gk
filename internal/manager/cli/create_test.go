@@ -1,4 +1,4 @@
-package cli
+package cli_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/nekr0z/gk/internal/manager/cli"
 	"github.com/nekr0z/gk/internal/manager/secret"
 	"github.com/nekr0z/gk/internal/manager/storage"
 	"github.com/nekr0z/gk/internal/manager/storage/sqlite"
@@ -25,7 +26,7 @@ func TestCreate_Text(t *testing.T) {
 
 	secretName := "test-text"
 
-	cmd := rootCmd()
+	cmd := cli.RootCmd()
 
 	cmd.SetArgs([]string{"create", "text", secretName, "my secret note", "-d", dbFilename, "-p", passPhrase, "-m", "key1=value1"})
 	cmd.Execute()
@@ -65,7 +66,7 @@ func TestCreate_Binary(t *testing.T) {
 	err = os.WriteFile(filename, bin, 0644)
 	require.NoError(t, err)
 
-	cmd := rootCmd()
+	cmd := cli.RootCmd()
 
 	cmd.SetArgs([]string{"create", "binary", secretName, filename, "-d", dbFilename, "-p", passPhrase, "-m", "key2=value2"})
 	cmd.Execute()
@@ -98,7 +99,7 @@ func TestCreate_Password(t *testing.T) {
 	user := "user@example.com"
 	pwd := "my secret password"
 
-	cmd := rootCmd()
+	cmd := cli.RootCmd()
 
 	cmd.SetArgs([]string{"create", "password", secretName, user, pwd, "-d", dbFilename, "-p", passPhrase, "-m", "key=value", "-m", "key2=value2"})
 	cmd.Execute()
@@ -136,7 +137,7 @@ func TestCreate_Card(t *testing.T) {
 	expiry := "01/36"
 	cvv := "777"
 
-	cmd := rootCmd()
+	cmd := cli.RootCmd()
 
 	cmd.SetArgs([]string{"create", "card", secretName, cardNumber, expiry, cvv, user, "-d", dbFilename, "-p", passPhrase, "-m", "key=value"})
 	cmd.Execute()

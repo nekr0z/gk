@@ -1,4 +1,4 @@
-package cli
+package cli_test
 
 import (
 	"bytes"
@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/nekr0z/gk/internal/manager/cli"
 	"github.com/nekr0z/gk/pkg/pb"
 )
 
@@ -40,7 +41,7 @@ func TestSignup(t *testing.T) {
 		s.Stop()
 	})
 
-	cmd := rootCmd()
+	cmd := cli.RootCmd()
 
 	b := &bytes.Buffer{}
 	cmd.SetOut(b)

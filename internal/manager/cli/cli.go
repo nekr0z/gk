@@ -30,19 +30,23 @@ func Execute() {
 		cancel()
 	}()
 
-	if err := rootCmd().ExecuteContext(ctx); err != nil {
+	if err := RootCmd().ExecuteContext(ctx); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
-func rootCmd() *cobra.Command {
+// RootCmd returns the root command for the application.
+func RootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "gk",
 		Short:   "GophKeeper password manager",
 		Long:    `A password manager written in Go.`,
 		Version: version.String(),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Println(viper.Get("db"))
+			fmt.Println(viper.Get("server.username"))
+			fmt.Println(viper.ConfigFileUsed())
 			return cmd.Usage()
 		},
 	}
@@ -66,10 +70,21 @@ func rootCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolP("insecure", "i", false, "disable TLS verification")
 	viper.BindPFlag("server.insecure", cmd.PersistentFlags().Lookup("insecure"))
 
+	cmd.PersistentFlags().StringP("prefer", "g", "", "`remote` or `local`")
+	viper.BindPFlag("prefer", cmd.PersistentFlags().Lookup("prefer"))
+
+	cmd.PersistentFlags().StringP("config", "c", "", "config file (if not set, will look for .gk.yaml in the home directory)")
+	viper.BindPFlag("config", cmd.PersistentFlags().Lookup("config"))
+
+	viper.SetConfigName(".gk")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("$HOME/")
+
 	cmd.AddCommand(createCmd())
 	cmd.AddCommand(deleteCmd())
 	cmd.AddCommand(showCmd())
 	cmd.AddCommand(signupCommand())
+	cmd.AddCommand(syncCommand())
 
 	return cmd
 }
@@ -82,6 +97,11 @@ func initConfig() {
 	viper.SetEnvPrefix("GK")
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	if viper.GetString("config") != "" {
+		viper.SetConfigFile(viper.GetString("config"))
+	}
+
+	viper.ReadInConfig()
 }
 
 func initStorage(cmd *cobra.Command) (*storage.Repository, error) {
@@ -104,6 +124,15 @@ func initStorage(cmd *cobra.Command) (*storage.Repository, error) {
 		}
 
 		opts = append(opts, storage.UseRemote(c))
+	}
+
+	if viper.GetString("prefer") != "" {
+		switch viper.GetString("prefer") {
+		case "remote":
+			opts = append(opts, storage.UseResolver(storage.PreferRemote()))
+		case "local":
+			opts = append(opts, storage.UseResolver(storage.PreferLocal()))
+		}
 	}
 
 	return storage.New(db, viper.GetString("passphrase"), opts...)

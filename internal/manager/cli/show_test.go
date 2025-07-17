@@ -1,4 +1,4 @@
-package cli
+package cli_test
 
 import (
 	"bytes"
@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/nekr0z/gk/internal/manager/cli"
 	"github.com/nekr0z/gk/internal/manager/secret"
 	"github.com/nekr0z/gk/internal/manager/storage"
 	"github.com/nekr0z/gk/internal/manager/storage/sqlite"
@@ -34,7 +35,7 @@ func TestShow_Text(t *testing.T) {
 	err = repo.Create(context.Background(), secretName, sec)
 	require.NoError(t, err)
 
-	cmd := rootCmd()
+	cmd := cli.RootCmd()
 
 	b := &bytes.Buffer{}
 	cmd.SetOut(b)
@@ -50,7 +51,7 @@ func TestShow_Text(t *testing.T) {
 
 	b = &bytes.Buffer{}
 
-	cmd = rootCmd()
+	cmd = cli.RootCmd()
 	cmd.SetOut(b)
 
 	filename := filepath.Join(dir, "test.txt")
@@ -95,7 +96,7 @@ func TestShow_Binary(t *testing.T) {
 	err = repo.Create(context.Background(), secretName, sec)
 	require.NoError(t, err)
 
-	cmd := rootCmd()
+	cmd := cli.RootCmd()
 
 	b := &bytes.Buffer{}
 	cmd.SetOut(b)
@@ -110,7 +111,7 @@ func TestShow_Binary(t *testing.T) {
 
 	b = &bytes.Buffer{}
 
-	cmd = rootCmd()
+	cmd = cli.RootCmd()
 	cmd.SetOut(b)
 
 	filename := filepath.Join(dir, "test.bin")

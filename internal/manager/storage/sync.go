@@ -26,6 +26,20 @@ type RemoteListedSecret struct {
 // ResolverFunc resolves conflicts between local and remote storage.
 type ResolverFunc func(ctx context.Context, local, remote crypt.Data) (crypt.Data, error)
 
+// PreferLocal returns a ResolverFunc that prefers local data.
+func PreferLocal() ResolverFunc {
+	return func(ctx context.Context, local, remote crypt.Data) (crypt.Data, error) {
+		return local, nil
+	}
+}
+
+// PreferRemote returns a ResolverFunc that prefers remote data.
+func PreferRemote() ResolverFunc {
+	return func(ctx context.Context, local, remote crypt.Data) (crypt.Data, error) {
+		return remote, nil
+	}
+}
+
 func syncAll(ctx context.Context, localStorage Storage, remote Remote, resolver ResolverFunc) error {
 	if ctx.Err() != nil {
 		return ctx.Err()

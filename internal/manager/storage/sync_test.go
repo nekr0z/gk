@@ -185,10 +185,7 @@ func TestSync_Conflict(t *testing.T) {
 	})
 
 	t.Run("remote wins", func(t *testing.T) {
-		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem), storage.UseResolver(
-			func(ctx context.Context, local, remote crypt.Data) (crypt.Data, error) {
-				return remote, nil
-			}))
+		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem), storage.UseResolver(storage.PreferRemote()))
 		require.NoError(t, err)
 
 		loc.On("Get", mock.Anything, testKey).Return(storage.StoredSecret{
@@ -206,10 +203,7 @@ func TestSync_Conflict(t *testing.T) {
 	})
 
 	t.Run("local wins", func(t *testing.T) {
-		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem), storage.UseResolver(
-			func(ctx context.Context, local, remote crypt.Data) (crypt.Data, error) {
-				return local, nil
-			}))
+		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem), storage.UseResolver(storage.PreferLocal()))
 		require.NoError(t, err)
 
 		loc.On("Get", mock.Anything, testKey).Return(storage.StoredSecret{
