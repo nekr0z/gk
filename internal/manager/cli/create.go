@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -43,7 +44,13 @@ func createTextCmd() *cobra.Command {
 			sec := secret.NewText(value)
 			sec.SetMetadata(viper.GetStringMapString("metadata"))
 
-			return repo.Create(cmd.Context(), name, sec)
+			err = repo.Create(cmd.Context(), name, sec)
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(cmd.OutOrStdout(), "Created secret %s\n", name)
+			return nil
 		},
 	}
 

@@ -1,6 +1,10 @@
 package cli
 
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+)
 
 func deleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -14,7 +18,15 @@ func deleteCmd() *cobra.Command {
 			}
 
 			name := args[0]
-			return repo.Delete(cmd.Context(), name)
+
+			err = repo.Delete(cmd.Context(), name)
+			if err != nil {
+				return err
+			}
+
+			fmt.Fprintf(cmd.OutOrStdout(), "Deleted secret %s\n", name)
+
+			return nil
 		},
 	}
 

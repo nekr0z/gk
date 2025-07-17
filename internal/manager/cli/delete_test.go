@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"context"
 	"path/filepath"
 	"testing"
@@ -30,6 +31,9 @@ func TestDelete(t *testing.T) {
 	require.NoError(t, err)
 
 	cmd := rootCmd()
+
+	b := &bytes.Buffer{}
+	cmd.SetOut(b)
 
 	cmd.SetArgs([]string{"delete", secretName, "-d", dbFilename, "-p", passPhrase})
 	cmd.Execute()
