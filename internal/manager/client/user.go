@@ -48,11 +48,17 @@ func (cr *creds) authInterceptor(c pb.UserServiceClient) grpc.UnaryClientInterce
 
 		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", cr.token))
 		err := invoker(ctx, method, req, resp, cc, opts...)
+		if err == nil {
+			return nil
+		}
+
 		if status.Code(err) == codes.Unauthenticated {
 			if err := cr.login(ctx, c); err != nil {
 				return err
 			}
 		}
+
+		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", cr.token))
 		return invoker(ctx, method, req, resp, cc, opts...)
 	}
 }

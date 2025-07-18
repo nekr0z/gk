@@ -16,3 +16,14 @@ packages:
     interfaces:
       Storage:
       Remote:
+  github.com/nekr0z/gk/internal/server/grpc:
+    interfaces:
+      UserService:
+  github.com/nekr0z/gk/internal/server/user:
+    interfaces:
+      UserStorage:
+  github.com/nekr0z/gk/pkg/pb:
+    interfaces:
+      UserServiceClient:
+    config:
+      filename: mocks.go

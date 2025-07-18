@@ -3,6 +3,7 @@ module github.com/nekr0z/gk
 go 1.23.5
 
 require (
+	github.com/golang-jwt/jwt/v5 v5.2.3
 	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
