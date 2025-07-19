@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
+	"github.com/nekr0z/gk/internal/hash"
 	"github.com/nekr0z/gk/internal/manager/crypt"
 	"github.com/nekr0z/gk/internal/manager/storage"
 )
@@ -83,12 +84,12 @@ func (s *Storage) Get(ctx context.Context, key string) (storage.StoredSecret, er
 		return storage.StoredSecret{}, fmt.Errorf("failed to get secret: %w", err)
 	}
 
-	serverHashArr := toHashArray(serverHash)
+	serverHashArr := hash.SliceToArray(serverHash)
 
 	return storage.StoredSecret{
 		EncryptedPayload: crypt.Data{
 			Data: encryptedPayload,
-			Hash: toHashArray(payloadHash),
+			Hash: hash.SliceToArray(payloadHash),
 		},
 		LastKnownServerHash: serverHashArr,
 	}, nil
@@ -132,25 +133,10 @@ func (s *Storage) List(ctx context.Context) (map[string]storage.ListedSecret, er
 			return nil, err
 		}
 		secrets[id] = storage.ListedSecret{
-			Hash:                toHashArray(payloadHash),
-			LastKnownServerHash: toHashArray(serverHash),
+			Hash:                hash.SliceToArray(payloadHash),
+			LastKnownServerHash: hash.SliceToArray(serverHash),
 		}
 	}
 
 	return secrets, nil
-}
-
-func toHashArray(b []byte) [32]byte {
-	if len(b) == 0 {
-		return [32]byte{}
-	}
-
-	if len(b) != 32 {
-		panic("invalid hash length")
-	}
-
-	var arr [32]byte
-	copy(arr[:], b)
-
-	return arr
 }

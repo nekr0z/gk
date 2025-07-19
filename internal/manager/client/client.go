@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/nekr0z/gk/internal/hash"
 	"github.com/nekr0z/gk/internal/manager/crypt"
 	"github.com/nekr0z/gk/internal/manager/storage"
 	"github.com/nekr0z/gk/pkg/pb"
@@ -93,7 +94,7 @@ func (c *Client) List(ctx context.Context) ([]storage.RemoteListedSecret, error)
 	for _, secret := range resp.GetHashes() {
 		secrets = append(secrets, storage.RemoteListedSecret{
 			Key:  secret.Key,
-			Hash: toHashArray(secret.Hash),
+			Hash: hash.SliceToArray(secret.Hash),
 		})
 	}
 	return secrets, nil
@@ -115,7 +116,7 @@ func (c *Client) Get(ctx context.Context, key string) (crypt.Data, error) {
 
 	return crypt.Data{
 		Data: resp.GetData(),
-		Hash: toHashArray(resp.GetHash()),
+		Hash: hash.SliceToArray(resp.GetHash()),
 	}, nil
 }
 
@@ -146,19 +147,4 @@ func (c *Client) Delete(ctx context.Context, key string, knownHash [32]byte) err
 	}
 
 	return err
-}
-
-func toHashArray(b []byte) [32]byte {
-	if len(b) == 0 {
-		return [32]byte{}
-	}
-
-	if len(b) != 32 {
-		panic("invalid hash length")
-	}
-
-	var arr [32]byte
-	copy(arr[:], b)
-
-	return arr
 }
