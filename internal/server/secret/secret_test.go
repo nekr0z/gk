@@ -2,6 +2,7 @@ package secret
 
 import (
 	"context"
+	"crypto/sha256"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -61,7 +62,8 @@ func TestService_PutSecret(t *testing.T) {
 		svc := NewService(mockStorage)
 
 		secret := Secret{Key: "test", Data: []byte("data")}
-		var hash [32]byte
+		secret.Hash = sha256.Sum256(secret.Data)
+		hash := [32]byte{}
 		mockStorage.On("Put", mock.Anything, "user1", secret, hash).Return(nil)
 
 		err := svc.PutSecret(context.Background(), "user1", secret, hash)
@@ -87,6 +89,7 @@ func TestService_PutSecret(t *testing.T) {
 		svc := NewService(mockStorage)
 
 		secret := Secret{Key: "test", Data: []byte("data")}
+		secret.Hash = sha256.Sum256(secret.Data)
 		var hash [32]byte
 		mockStorage.On("Put", mock.Anything, "user1", secret, hash).Return(ErrWrongHash)
 

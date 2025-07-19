@@ -2,12 +2,7 @@
 package cli
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,24 +12,6 @@ import (
 	"github.com/nekr0z/gk/internal/manager/storage/sqlite"
 	"github.com/nekr0z/gk/internal/version"
 )
-
-// Execute runs the root command with graceful shutdown on signals from OS.
-func Execute() {
-	ctx, cancel := context.WithCancel(context.Background())
-
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-
-	go func() {
-		<-sigChan
-		cancel()
-	}()
-
-	if err := RootCmd().ExecuteContext(ctx); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
 
 // RootCmd returns the root command for the application.
 func RootCmd() *cobra.Command {

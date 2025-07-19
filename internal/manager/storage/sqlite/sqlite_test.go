@@ -75,6 +75,14 @@ func TestSQLStorage(t *testing.T) {
 		assert.Equal(t, secret.LastKnownServerHash, got.LastKnownServerHash, "Server hash mismatch")
 	})
 
+	t.Run("nullify a secret", func(t *testing.T) {
+		err := db.Put(ctx, key, storage.StoredSecret{
+			EncryptedPayload:    crypt.Data{},
+			LastKnownServerHash: [32]byte{1, 2, 3, 4},
+		})
+		assert.NoError(t, err)
+	})
+
 	t.Run("DeleteSecret", func(t *testing.T) {
 		err := db.Delete(ctx, key)
 		assert.NoError(t, err, "Delete failed")

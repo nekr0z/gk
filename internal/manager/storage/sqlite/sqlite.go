@@ -20,9 +20,9 @@ const (
 	createTableQuery = `
 	CREATE TABLE IF NOT EXISTS ` + tableName + `(
 		id TEXT PRIMARY KEY,
-		encrypted_payload BLOB NOT NULL,
-		payload_hash BLOB NOT NULL,
-		server_hash BLOB NOT NULL
+		encrypted_payload BLOB,
+		payload_hash BLOB,
+		server_hash BLOB
 	)`
 	selectQuery = `SELECT encrypted_payload, payload_hash, server_hash FROM ` + tableName + ` WHERE id = ?`
 	insertQuery = `INSERT INTO ` + tableName + `

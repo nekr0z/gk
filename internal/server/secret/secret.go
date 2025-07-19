@@ -3,6 +3,7 @@ package secret
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 )
 
@@ -51,6 +52,8 @@ func (s *Service) PutSecret(ctx context.Context, username string, secret Secret,
 	if username == "" {
 		return ErrNoUser
 	}
+
+	secret.Hash = sha256.Sum256(secret.Data)
 
 	return s.storage.Put(ctx, username, secret, hash)
 }
