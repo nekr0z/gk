@@ -44,9 +44,6 @@ func RootCmd() *cobra.Command {
 		Long:    `A password manager written in Go.`,
 		Version: version.String(),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println(viper.Get("db"))
-			fmt.Println(viper.Get("server.username"))
-			fmt.Println(viper.ConfigFileUsed())
 			return cmd.Usage()
 		},
 	}

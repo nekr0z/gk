@@ -10,3 +10,4 @@ LDFLAGS=(
 )
 
 go build -ldflags="${LDFLAGS[*]}" -o gk ./cmd/gk/main.go
+go build -ldflags="${LDFLAGS[*]}" -o gk-server ./cmd/gk-server/main.go

@@ -7,8 +7,6 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-// var _ secret.SecretStorage = DB{}
-
 // DB is the database.
 type DB struct {
 	*sql.DB

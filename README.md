@@ -67,3 +67,26 @@ Synchronize all secrets with a server:
 ```
 gk sync
 ```
+
+## Server
+
+Allows users to sign up and to synchronize secrets between clients.
+
+### Configuration
+
+Configuration is done via a config file; any setting can be overridden by environment variables and command line flags. The default config file location in `.gk.yaml` in the home directory, it can also be overriden using `-c` or `--config` flags or `GK_CONFIG` environment variable.
+
+```yaml
+dsn: "" # DSN of the PostgreSQL database, override with `-d`, `--dsn` or `GK_SERVER_DSN` environment variable
+key: "" # JWT signing key (random one will be created if not provided), not recommended to be stored in the config file, override with `-k`, `--key` or `GK_SERVER_KEY` environment variable
+address: "" # server listening address, override with `-a`, `--address` or `GK_SERVER_ADDRESS` environment variable
+```
+
+### Usage
+
+Start the server:
+```
+gk server -d postgres://user:password@localhost/gk -k secret -a :8080
+```
+
+Users can sign up on the server using the `gk signup` command and synchronize secrets from a client using the `gk sync` command.
