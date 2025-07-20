@@ -170,7 +170,7 @@ func TestIntegration(t *testing.T) {
 		cmd.SetArgs([]string{"sync", "-i", "-s", serverAddr, "-u", username, "-w", password, "-d", db2})
 
 		err := cmd.Execute()
-		assert.Error(t, err)
+		assert.Error(t, err, "conflict expected")
 	})
 
 	t.Run("sync the second client with resolver", func(t *testing.T) {
@@ -202,5 +202,53 @@ func TestIntegration(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Contains(t, string(out), "This note is very secret again")
+	})
+
+	t.Run("re-register user", func(t *testing.T) {
+		cmd := gk.RootCmd()
+		cmd.SetArgs([]string{"signup", "-i", "-s", serverAddr, "-u", username, "-w", "someotherpassword"})
+
+		err := cmd.Execute()
+		assert.Error(t, err, "already registered")
+	})
+
+	t.Run("delete the secret on the first client", func(t *testing.T) {
+		cmd := gk.RootCmd()
+		cmd.SetArgs([]string{"delete", "secret-note", "-d", db1, "-p", passphrase})
+
+		err := cmd.Execute()
+		assert.NoError(t, err)
+	})
+
+	t.Run("check that the first client no longer has the secret", func(t *testing.T) {
+		cmd := gk.RootCmd()
+		cmd.SetArgs([]string{"show", "secret-note", "-d", db1, "-p", passphrase})
+
+		err := cmd.Execute()
+		assert.Error(t, err, "should not be found")
+	})
+
+	t.Run("sync the first client after deletion", func(t *testing.T) {
+		cmd := gk.RootCmd()
+		cmd.SetArgs([]string{"sync", "-i", "-s", serverAddr, "-u", username, "-w", password, "-d", db1})
+
+		err := cmd.Execute()
+		assert.NoError(t, err)
+	})
+
+	t.Run("sync the second client after deletion", func(t *testing.T) {
+		cmd := gk.RootCmd()
+		cmd.SetArgs([]string{"sync", "-i", "-s", serverAddr, "-u", username, "-w", password, "-d", db2})
+
+		err := cmd.Execute()
+		assert.NoError(t, err)
+	})
+
+	t.Run("check that the second client no longer has the secret", func(t *testing.T) {
+		cmd := gk.RootCmd()
+		cmd.SetArgs([]string{"show", "secret-note", "-d", db2, "-p", passphrase})
+
+		err := cmd.Execute()
+		assert.Error(t, err, "should not be found")
 	})
 }

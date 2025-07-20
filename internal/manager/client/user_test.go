@@ -49,7 +49,7 @@ func TestClient_Signup(t *testing.T) {
 			password: "testpass",
 		}
 
-		mockClient.On("Signup", context.Background(), &pb.SignupRequest{
+		mockClient.EXPECT().Signup(context.Background(), &pb.SignupRequest{
 			Username: "testuser",
 			Password: "testpass",
 		}).Return(&emptypb.Empty{}, status.Error(codes.Internal, "internal error"))
@@ -237,7 +237,7 @@ func Test_creds_authInterceptor(t *testing.T) {
 			return status.Error(codes.Unauthenticated, "token expired")
 		}
 
-		mockClient.On("Login", mock.Anything, &pb.LoginRequest{
+		mockClient.EXPECT().Login(mock.Anything, &pb.LoginRequest{
 			Username: "testuser",
 			Password: "testpass",
 		}).Return((*pb.LoginResponse)(nil), status.Error(codes.Internal, "login failed"))

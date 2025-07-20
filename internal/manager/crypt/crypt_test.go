@@ -93,6 +93,38 @@ func TestDecrypt_TamperedHash(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestDecrypt_ShortData(t *testing.T) {
+	t.Parallel()
+
+	t.Run("shorter than salt", func(t *testing.T) {
+		t.Parallel()
+
+		b := make([]byte, 2)
+		_, err := rand.Read(b)
+		require.NoError(t, err)
+
+		_, err = Decrypt(Data{
+			Data: b,
+			Hash: sha256.Sum256(b),
+		}, "password")
+		assert.Error(t, err)
+	})
+
+	t.Run("salt but no nonce", func(t *testing.T) {
+		t.Parallel()
+
+		b := make([]byte, 10)
+		_, err := rand.Read(b)
+		require.NoError(t, err)
+
+		_, err = Decrypt(Data{
+			Data: b,
+			Hash: sha256.Sum256(b),
+		}, "password")
+		assert.Error(t, err)
+	})
+}
+
 type mockUnencryptedData string
 
 func (m mockUnencryptedData) Marshal() []byte {

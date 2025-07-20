@@ -82,7 +82,7 @@ func (r *Repository) Read(ctx context.Context, key string) (secret.Secret, error
 		return secret.Secret{}, err
 	}
 
-	if len(storedSecret.EncryptedPayload.Data) == 0 && storedSecret.LastKnownServerHash == [32]byte{} {
+	if len(storedSecret.EncryptedPayload.Data) == 0 && storedSecret.EncryptedPayload.Hash == [32]byte{} {
 		return secret.Secret{}, fmt.Errorf("secret not found")
 	}
 

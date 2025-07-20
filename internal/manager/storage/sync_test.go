@@ -2,8 +2,10 @@ package storage_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -160,6 +162,13 @@ func TestSync(t *testing.T) {
 
 		check(t)
 	})
+
+	t.Run("not in storage", func(t *testing.T) {
+		loc.EXPECT().Get(mock.Anything, testKey).Return(storage.StoredSecret{}, storage.ErrNotFound)
+		rem.EXPECT().Get(mock.Anything, testKey).Return(crypt.Data{}, storage.ErrNotFound)
+
+		check(t)
+	})
 }
 
 func TestSync_Conflict(t *testing.T) {
@@ -264,6 +273,102 @@ func TestSync_Conflict(t *testing.T) {
 	})
 }
 
+func TestSync_Error(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	t.Run("context canceled", func(t *testing.T) {
+		t.Parallel()
+
+		rem := storage.NewMockRemote(t)
+		loc := storage.NewMockStorage(t)
+
+		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem))
+		require.NoError(t, err)
+
+		ctx, cancel := context.WithCancel(ctx)
+		cancel()
+		err = repo.Sync(ctx, "test")
+		assert.Error(t, err, "context canceled")
+
+		loc.AssertExpectations(t)
+		rem.AssertExpectations(t)
+	})
+
+	t.Run("local get error", func(t *testing.T) {
+		t.Parallel()
+
+		rem := storage.NewMockRemote(t)
+		loc := storage.NewMockStorage(t)
+
+		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem))
+		require.NoError(t, err)
+
+		loc.EXPECT().Get(mock.Anything, "test").Return(storage.StoredSecret{}, errors.New("local get error"))
+
+		err = repo.Sync(ctx, "test")
+		assert.Error(t, err)
+
+		loc.AssertExpectations(t)
+		rem.AssertExpectations(t)
+	})
+
+	t.Run("remote get error", func(t *testing.T) {
+		t.Parallel()
+
+		rem := storage.NewMockRemote(t)
+		loc := storage.NewMockStorage(t)
+
+		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem))
+		require.NoError(t, err)
+
+		loc.EXPECT().Get(mock.Anything, "test").Return(storage.StoredSecret{}, nil)
+		rem.EXPECT().Get(mock.Anything, "test").Return(crypt.Data{}, errors.New("remote get error"))
+
+		err = repo.Sync(ctx, "test")
+		assert.Error(t, err)
+
+		loc.AssertExpectations(t)
+		rem.AssertExpectations(t)
+	})
+
+	t.Run("resolver error", func(t *testing.T) {
+		t.Parallel()
+
+		rem := storage.NewMockRemote(t)
+		loc := storage.NewMockStorage(t)
+
+		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem), storage.UseResolver(
+			func(ctx context.Context, local, remote crypt.Data) (crypt.Data, error) {
+				return crypt.Data{}, errors.New("resolver error")
+			}))
+		require.NoError(t, err)
+
+		loc.EXPECT().Get(mock.Anything, testKey).Return(storage.StoredSecret{
+			EncryptedPayload:    payload3,
+			LastKnownServerHash: hash1,
+		}, nil).Once()
+		rem.EXPECT().Get(mock.Anything, testKey).Return(payload2, nil).Once()
+
+		err = repo.Sync(ctx, testKey)
+		assert.Error(t, err)
+
+		loc.AssertExpectations(t)
+		rem.AssertExpectations(t)
+	})
+}
+
+func TestSync_Nil(t *testing.T) {
+	t.Parallel()
+
+	st := storage.NewMockStorage(t)
+	r, err := storage.New(st, testPassphrase)
+	require.NoError(t, err)
+
+	err = r.Sync(context.Background(), "test")
+	assert.Error(t, err, "expected error on nil remote")
+}
+
 func TestSyncAll(t *testing.T) {
 	t.Parallel()
 
@@ -327,4 +432,78 @@ func TestSyncAll(t *testing.T) {
 
 	loc.AssertExpectations(t)
 	rem.AssertExpectations(t)
+}
+
+func TestSyncAll_Error(t *testing.T) {
+	t.Parallel()
+
+	t.Run("context canceled", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := context.Background()
+
+		rem := storage.NewMockRemote(t)
+		loc := storage.NewMockStorage(t)
+
+		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem))
+		require.NoError(t, err)
+
+		ctx, cancel := context.WithCancel(ctx)
+		cancel()
+		err = repo.SyncAll(ctx)
+		assert.Error(t, err, "context canceled")
+
+		loc.AssertExpectations(t)
+		rem.AssertExpectations(t)
+	})
+
+	t.Run("local list error", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := context.Background()
+
+		rem := storage.NewMockRemote(t)
+		loc := storage.NewMockStorage(t)
+
+		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem))
+		require.NoError(t, err)
+
+		loc.On("List", mock.Anything).Return(nil, errors.New("local list error"))
+		err = repo.SyncAll(ctx)
+		assert.Error(t, err, "local list error")
+
+		loc.AssertExpectations(t)
+		rem.AssertExpectations(t)
+	})
+
+	t.Run("remote list error", func(t *testing.T) {
+		t.Parallel()
+
+		ctx := context.Background()
+
+		rem := storage.NewMockRemote(t)
+		loc := storage.NewMockStorage(t)
+
+		repo, err := storage.New(loc, testPassphrase, storage.UseRemote(rem))
+		require.NoError(t, err)
+
+		loc.On("List", mock.Anything).Return(map[string]storage.ListedSecret{}, nil)
+		rem.On("List", mock.Anything).Return(nil, errors.New("remote list error"))
+		err = repo.SyncAll(ctx)
+		assert.Error(t, err, "remote list error")
+
+		loc.AssertExpectations(t)
+		rem.AssertExpectations(t)
+	})
+}
+
+func TestSyncAll_Nil(t *testing.T) {
+	t.Parallel()
+
+	st := storage.NewMockStorage(t)
+	r, err := storage.New(st, testPassphrase)
+	require.NoError(t, err)
+
+	err = r.SyncAll(context.Background())
+	assert.Error(t, err, "expected error on nil remote")
 }
