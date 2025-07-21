@@ -1,0 +1,24 @@
+gk.rootcmd.flags.passphrase:
+    hash: sha1-18991936997e2078975e7504ac8e049e70f0f0e3
+    other: кодовая фраза для шифрования
+gk.rootcmd.flags.password:
+    hash: sha1-5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8
+    other: пароль
+gk.rootcmd.flags.prefer:
+    hash: sha1-d57b0c15ba7c4f90888ef644b44984abbe8b237b
+    other: '`remote` или `local`'
+gk.rootcmd.flags.server:
+    hash: sha1-58686b2046b69ea62ca75e321b6b1c90548bc926
+    other: адрес сервера
+gk.rootcmd.flags.username:
+    hash: sha1-6efc55969063bfe13af3cfd4882be533a619b33f
+    other: имя пользователя
+gk.rootcmd.long:
+    hash: sha1-79c488f709dda943a48c5ed12ccc63afbe38dbbf
+    other: Менеджер паролей, написанный на Go.
+gk.rootcmd.short:
+    hash: sha1-6b6bdb41f22a0ef376ada5080af173286db527a7
+    other: Менеджер паролей GophKeeper
+version:
+    hash: sha1-e7d2fa6166fa01e1d4b7d7a272a391c058993b2f
+    other: '{{.Version}} собрано {{.Date}}'

@@ -4,9 +4,11 @@ package cli
 import (
 	"strings"
 
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	i18ninit "github.com/nekr0z/gk/internal/i18n"
 	"github.com/nekr0z/gk/internal/manager/client"
 	"github.com/nekr0z/gk/internal/manager/storage"
 	"github.com/nekr0z/gk/internal/manager/storage/sqlite"
@@ -17,48 +19,51 @@ import (
 func RootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "gk",
-		Short:   "GophKeeper password manager",
-		Long:    `A password manager written in Go.`,
 		Version: version.String(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Usage()
 		},
 	}
 
-	cmd.PersistentFlags().StringP("db", "d", "", "database file (default is gk.sqlite in current directory)")
+	loc := i18ninit.NewLocalizer(cmd)
+
+	cmd.Short = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.short"})
+	cmd.Long = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.long"})
+
+	cmd.PersistentFlags().StringP("db", "d", "", loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.flags.db"}))
 	viper.BindPFlag("db", cmd.PersistentFlags().Lookup("db"))
 	viper.SetDefault("db", "gk.sqlite")
 
-	cmd.PersistentFlags().StringP("passphrase", "p", "", "passphrase for encryption")
+	cmd.PersistentFlags().StringP("passphrase", "p", "", loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.flags.passphrase"}))
 	viper.BindPFlag("passphrase", cmd.PersistentFlags().Lookup("passphrase"))
 
-	cmd.PersistentFlags().StringP("server", "s", "", "server address")
+	cmd.PersistentFlags().StringP("server", "s", "", loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.flags.server"}))
 	viper.BindPFlag("server.address", cmd.PersistentFlags().Lookup("server"))
 
-	cmd.PersistentFlags().StringP("username", "u", "", "user name")
+	cmd.PersistentFlags().StringP("username", "u", "", loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.flags.username"}))
 	viper.BindPFlag("server.username", cmd.PersistentFlags().Lookup("username"))
 
-	cmd.PersistentFlags().StringP("password", "w", "", "password")
+	cmd.PersistentFlags().StringP("password", "w", "", loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.flags.password"}))
 	viper.BindPFlag("server.password", cmd.PersistentFlags().Lookup("password"))
 
-	cmd.PersistentFlags().BoolP("insecure", "i", false, "disable TLS verification")
+	cmd.PersistentFlags().BoolP("insecure", "i", false, loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.flags.insecure"}))
 	viper.BindPFlag("server.insecure", cmd.PersistentFlags().Lookup("insecure"))
 
-	cmd.PersistentFlags().StringP("prefer", "g", "", "`remote` or `local`")
+	cmd.PersistentFlags().StringP("prefer", "g", "", loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.flags.prefer"}))
 	viper.BindPFlag("prefer", cmd.PersistentFlags().Lookup("prefer"))
 
-	cmd.PersistentFlags().StringP("config", "c", "", "config file (if not set, will look for .gk.yaml in the home directory)")
+	cmd.PersistentFlags().StringP("config", "c", "", loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.rootcmd.flags.config"}))
 	viper.BindPFlag("config", cmd.PersistentFlags().Lookup("config"))
 
 	viper.SetConfigName(".gk")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("$HOME/")
 
-	cmd.AddCommand(createCmd())
-	cmd.AddCommand(deleteCmd())
-	cmd.AddCommand(showCmd())
-	cmd.AddCommand(signupCommand())
-	cmd.AddCommand(syncCommand())
+	cmd.AddCommand(createCmd(loc))
+	cmd.AddCommand(deleteCmd(loc))
+	cmd.AddCommand(showCmd(loc))
+	cmd.AddCommand(signupCommand(loc))
+	cmd.AddCommand(syncCommand(loc))
 
 	return cmd
 }

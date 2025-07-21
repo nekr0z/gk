@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"net"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -42,6 +43,7 @@ func TestSignup(t *testing.T) {
 	})
 
 	cmd := cli.RootCmd()
+	os.Setenv("LANGUAGE", "en")
 
 	b := &bytes.Buffer{}
 	cmd.SetOut(b)

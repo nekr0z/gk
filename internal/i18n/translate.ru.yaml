@@ -1,0 +1,69 @@
+gk.create.binary.short:
+    hash: sha1-f8738ce89c12cef93fe0fdcf359178db40212dbb
+    other: Create a new binary secret from file
+gk.create.binary.use:
+    hash: sha1-f7b38bc33bded796e8d64d745983843ae5f7dc84
+    other: binary <name> <filename>
+gk.create.card.short:
+    hash: sha1-f396faa4dfce7edf2c4496798955d1832e96c33f
+    other: Create a new card secret
+gk.create.card.use:
+    hash: sha1-a54bcb1498147689918d1a236131df8c79d9850d
+    other: card <name> <number> <expiry> <cvv> [<username>]
+gk.create.flags.metadata:
+    hash: sha1-75b14eef040e8d69a1684231caae087e770a5497
+    other: metadata for the secret (key=value), multiple can be provided
+gk.create.password.short:
+    hash: sha1-9b1adb96b699d2cf49a0a338910a2983188ac5f1
+    other: Create a new password secret
+gk.create.password.use:
+    hash: sha1-a1899bf2b49f6ec56972739850957e06d5f86e7c
+    other: password <name> <username> <password>
+gk.create.short:
+    hash: sha1-76c078543e2d18124adf7f662f906b9e8fc26bf0
+    other: Create a new secret
+gk.create.text.short:
+    hash: sha1-c8ebd39453f91c97cea02321ad969af30bd7ed6e
+    other: Create a new text secret
+gk.create.text.use:
+    hash: sha1-db75c59c124ce4776b122f8e67441037f1a719da
+    other: text <name> <value>
+gk.delete.short:
+    hash: sha1-8c9790c1cb2cdbf1f8cf14f4ae57a2b2d318abb4
+    other: Delete a secret
+gk.delete.use:
+    hash: sha1-6d971c555746818e53b5b4978e65d37ac3502085
+    other: delete <name>
+gk.rootcmd.flags.config:
+    hash: sha1-c5107905de1ff08a767ae26fbda9655cbda8188c
+    other: config file (if not set, will look for .gk.yaml in the home directory)
+gk.rootcmd.flags.db:
+    hash: sha1-b7156bb025ce30fa24288013b9922ae32c2948e0
+    other: database file (default is gk.sqlite in current directory)
+gk.rootcmd.flags.insecure:
+    hash: sha1-729970756f8b757b84c5f649fbc0fd175e0940e9
+    other: disable TLS verification
+gk.show.flags.target-file:
+    hash: sha1-344f555372d93f22ae65dd1143bbf07d7ab677aa
+    other: file to save the secret content to (otherwise will only print to stdout)
+gk.show.short:
+    hash: sha1-220364a52fe656e451e1d688a4d5098659262e8a
+    other: Show the secret
+gk.show.use:
+    hash: sha1-4fc9ab14ac94653c7c9b09478bb63e3b223dd51d
+    other: show <name>
+gk.signup.long:
+    hash: sha1-5d13ebf98953cb578ae4234cb163bf6cfaf447c9
+    other: Sign up for a new account on the configured server using the configured credentials.
+gk.signup.short:
+    hash: sha1-4c4773e451c399785b926de45d2e3aa7d3c68030
+    other: Sign up for a new account
+gk.signup.signing:
+    hash: sha1-a84cae77c48e9e2be6184a0298f674044fd57a5c
+    other: Signing up...
+gk.signup.success:
+    hash: sha1-6edd123a6ebec81d55f1f43e9690aa9e730f2732
+    other: Signup with username {{.Username}} successful!
+gk.sync.short:
+    hash: sha1-9f44730a0a792499be68795cf8124249220ccde9
+    other: Sync secrets with the server

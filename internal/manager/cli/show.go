@@ -4,18 +4,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/nekr0z/gk/internal/manager/secret"
 )
 
-func showCmd() *cobra.Command {
+func showCmd(loc *i18n.Localizer) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show <name>",
-		Short: "Show the secret",
-		Long:  "Show the secret",
-		Args:  cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repo, err := initStorage(cmd)
 			if err != nil {
@@ -48,7 +46,10 @@ func showCmd() *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringP("target-file", "t", "", "file to save the secret content to (otherwise will only print to stdout)")
+	cmd.Use = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.show.use"})
+	cmd.Short = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.show.short"})
+
+	cmd.PersistentFlags().StringP("target-file", "t", "", loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.show.flags.target-file"}))
 	viper.BindPFlag("target-file", cmd.PersistentFlags().Lookup("target-file"))
 
 	return cmd

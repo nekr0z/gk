@@ -1,0 +1,31 @@
+gk.create.binary.short: Create a new binary secret from file
+gk.create.binary.use: binary <name> <filename>
+gk.create.card.short: Create a new card secret
+gk.create.card.use: card <name> <number> <expiry> <cvv> [<username>]
+gk.create.flags.metadata: metadata for the secret (key=value), multiple can be provided
+gk.create.password.short: Create a new password secret
+gk.create.password.use: password <name> <username> <password>
+gk.create.short: Create a new secret
+gk.create.text.short: Create a new text secret
+gk.create.text.use: text <name> <value>
+gk.delete.short: Delete a secret
+gk.delete.use: delete <name>
+gk.rootcmd.flags.config: config file (if not set, will look for .gk.yaml in the home directory)
+gk.rootcmd.flags.db: database file (default is gk.sqlite in current directory)
+gk.rootcmd.flags.insecure: disable TLS verification
+gk.rootcmd.flags.passphrase: passphrase for encryption
+gk.rootcmd.flags.password: password
+gk.rootcmd.flags.prefer: '`remote` or `local`'
+gk.rootcmd.flags.server: server address
+gk.rootcmd.flags.username: user name
+gk.rootcmd.long: A password manager written in Go.
+gk.rootcmd.short: GophKeeper password manager
+gk.show.flags.target-file: file to save the secret content to (otherwise will only print to stdout)
+gk.show.short: Show the secret
+gk.show.use: show <name>
+gk.signup.long: Sign up for a new account on the configured server using the configured credentials.
+gk.signup.short: Sign up for a new account
+gk.signup.signing: Signing up...
+gk.signup.success: Signup with username {{.Username}} successful!
+gk.sync.short: Sync secrets with the server
+version: '{{.Version}} built on {{.Date}}'

@@ -51,6 +51,7 @@ func TestShow_Text(t *testing.T) {
 
 	b = &bytes.Buffer{}
 
+	os.Setenv("LANGUAGE", "en")
 	cmd = cli.RootCmd()
 	cmd.SetOut(b)
 
@@ -96,6 +97,7 @@ func TestShow_Binary(t *testing.T) {
 	err = repo.Create(context.Background(), secretName, sec)
 	require.NoError(t, err)
 
+	os.Setenv("LANGUAGE", "en")
 	cmd := cli.RootCmd()
 
 	b := &bytes.Buffer{}

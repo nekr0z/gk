@@ -4,34 +4,34 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/nekr0z/gk/internal/manager/secret"
 )
 
-func createCmd() *cobra.Command {
+func createCmd(loc *i18n.Localizer) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create a new secret",
+		Use: "create",
 	}
 
-	cmd.PersistentFlags().StringToStringP("metadata", "m", nil, "metadata for the secret (key=value), multiple can be provided")
+	cmd.Short = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.short"})
+
+	cmd.PersistentFlags().StringToStringP("metadata", "m", nil, loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.flags.metadata"}))
 	viper.BindPFlag("metadata", cmd.PersistentFlags().Lookup("metadata"))
 
-	cmd.AddCommand(createTextCmd())
-	cmd.AddCommand(createBinaryCmd())
-	cmd.AddCommand(createPasswordCmd())
-	cmd.AddCommand(createCardCmd())
+	cmd.AddCommand(createTextCmd(loc))
+	cmd.AddCommand(createBinaryCmd(loc))
+	cmd.AddCommand(createPasswordCmd(loc))
+	cmd.AddCommand(createCardCmd(loc))
 
 	return cmd
 }
 
-func createTextCmd() *cobra.Command {
+func createTextCmd(loc *i18n.Localizer) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "text <name> <value>",
-		Short: "Create a new text secret",
-		Args:  cobra.ExactArgs(2),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repo, err := initStorage(cmd)
 			if err != nil {
@@ -54,14 +54,15 @@ func createTextCmd() *cobra.Command {
 		},
 	}
 
+	cmd.Use = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.text.use"})
+	cmd.Short = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.text.short"})
+
 	return cmd
 }
 
-func createBinaryCmd() *cobra.Command {
+func createBinaryCmd(loc *i18n.Localizer) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "binary <name> <filename>",
-		Short: "Create a new binary secret from file",
-		Args:  cobra.ExactArgs(2),
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repo, err := initStorage(cmd)
 			if err != nil {
@@ -83,14 +84,15 @@ func createBinaryCmd() *cobra.Command {
 		},
 	}
 
+	cmd.Use = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.binary.use"})
+	cmd.Short = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.binary.short"})
+
 	return cmd
 }
 
-func createPasswordCmd() *cobra.Command {
+func createPasswordCmd(loc *i18n.Localizer) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "password <name> <username> <password>",
-		Short: "Create a new password secret",
-		Args:  cobra.ExactArgs(3),
+		Args: cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repo, err := initStorage(cmd)
 			if err != nil {
@@ -108,14 +110,15 @@ func createPasswordCmd() *cobra.Command {
 		},
 	}
 
+	cmd.Use = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.password.use"})
+	cmd.Short = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.password.short"})
+
 	return cmd
 }
 
-func createCardCmd() *cobra.Command {
+func createCardCmd(loc *i18n.Localizer) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "card <name> <number> <expiry> <cvv> [<username>]",
-		Short: "Create a new card secret",
-		Args:  cobra.RangeArgs(4, 5),
+		Args: cobra.RangeArgs(4, 5),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			repo, err := initStorage(cmd)
 			if err != nil {
@@ -137,6 +140,9 @@ func createCardCmd() *cobra.Command {
 			return repo.Create(cmd.Context(), name, sec)
 		},
 	}
+
+	cmd.Use = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.card.use"})
+	cmd.Short = loc.MustLocalize(&i18n.LocalizeConfig{MessageID: "gk.create.card.short"})
 
 	return cmd
 }
