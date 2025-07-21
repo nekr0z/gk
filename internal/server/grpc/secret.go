@@ -16,14 +16,14 @@ import (
 
 // SecretServiceServer is the server API for secrets service.
 type SecretServiceServer struct {
-	s SecretService
+	secretService SecretService
 
 	pb.UnimplementedSecretServiceServer
 }
 
 // NewSecretServiceServer creates a new secret service server.
 func NewSecretServiceServer(s SecretService) *SecretServiceServer {
-	return &SecretServiceServer{s: s}
+	return &SecretServiceServer{secretService: s}
 }
 
 // GetSecret returns a secret.
@@ -35,7 +35,7 @@ func (s *SecretServiceServer) GetSecret(ctx context.Context, req *pb.GetSecretRe
 
 	key := req.GetKey()
 
-	sec, err := s.s.GetSecret(ctx, username, key)
+	sec, err := s.secretService.GetSecret(ctx, username, key)
 	if err == nil {
 		return &pb.GetSecretResponse{
 			Data: sec.Data,
@@ -60,7 +60,7 @@ func (s *SecretServiceServer) PutSecret(ctx context.Context, req *pb.PutSecretRe
 	key := req.GetKey()
 	data := req.GetData()
 
-	err = s.s.PutSecret(ctx, username, secret.Secret{
+	err = s.secretService.PutSecret(ctx, username, secret.Secret{
 		Key:  key,
 		Data: data,
 	}, hash.SliceToArray(req.GetKnownHash()))
@@ -84,7 +84,7 @@ func (s *SecretServiceServer) DeleteSecret(ctx context.Context, req *pb.DeleteSe
 
 	key := req.GetKey()
 
-	err = s.s.DeleteSecret(ctx, username, key, hash.SliceToArray(req.GetKnownHash()))
+	err = s.secretService.DeleteSecret(ctx, username, key, hash.SliceToArray(req.GetKnownHash()))
 	if err == nil {
 		return &emptypb.Empty{}, nil
 	}
@@ -103,7 +103,7 @@ func (s *SecretServiceServer) ListHashes(ctx context.Context, _ *emptypb.Empty) 
 		return nil, status.Errorf(codes.Unauthenticated, "no username in context")
 	}
 
-	hashes, err := s.s.ListSecrets(ctx, username)
+	hashes, err := s.secretService.ListSecrets(ctx, username)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "internal error: %v", err)
 	}

@@ -18,7 +18,7 @@ import (
 
 // UserServiceServer implements UserServiceServer.
 type UserServiceServer struct {
-	us UserService
+	userService UserService
 
 	pb.UnimplementedUserServiceServer
 }
@@ -26,13 +26,13 @@ type UserServiceServer struct {
 // NewUserService returns a new UserService.
 func NewUserService(us UserService) *UserServiceServer {
 	return &UserServiceServer{
-		us: us,
+		userService: us,
 	}
 }
 
 // Signup implements UserServiceServer.Signup.
 func (s *UserServiceServer) Signup(ctx context.Context, req *pb.SignupRequest) (*emptypb.Empty, error) {
-	err := s.us.Register(ctx, req.GetUsername(), req.GetPassword())
+	err := s.userService.Register(ctx, req.GetUsername(), req.GetPassword())
 	if err == nil {
 		return &emptypb.Empty{}, nil
 	}
@@ -46,7 +46,7 @@ func (s *UserServiceServer) Signup(ctx context.Context, req *pb.SignupRequest) (
 
 // Login implements UserServiceServer.Login.
 func (s *UserServiceServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	token, err := s.us.CreateToken(ctx, req.GetUsername(), req.GetPassword())
+	token, err := s.userService.CreateToken(ctx, req.GetUsername(), req.GetPassword())
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, err.Error())
 	}
