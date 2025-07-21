@@ -3,6 +3,7 @@ package sqlite
 import (
 	"context"
 	"crypto/sha256"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,10 @@ import (
 func TestSQLStorage(t *testing.T) {
 	ctx := context.Background()
 
-	db, err := New("file::memory:?cache=shared")
+	dir := t.TempDir()
+	filename := filepath.Join(dir, "test.db")
+
+	db, err := New(filename)
 	require.NoError(t, err, "Failed to create database")
 	defer db.Close()
 

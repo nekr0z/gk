@@ -12,10 +12,6 @@ import (
 )
 
 const (
-	createUserTableQuery = `CREATE TABLE IF NOT EXISTS users (
-		username TEXT NOT NULL UNIQUE PRIMARY KEY,
-		password BYTEA NOT NULL
-	)`
 	addUserQuery = `INSERT INTO users (username, password) VALUES ($1, $2)`
 	getUserQuery = `SELECT password FROM users WHERE username = $1`
 )

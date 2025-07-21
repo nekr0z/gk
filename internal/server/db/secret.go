@@ -14,13 +14,6 @@ import (
 )
 
 const (
-	createSecretTableQuery = `CREATE TABLE IF NOT EXISTS secrets (
-		username TEXT,
-		key TEXT,
-		data BYTEA,
-		hash BYTEA,
-		PRIMARY KEY (username, key)
-	)`
 	addSecretQuery    = `INSERT INTO secrets (username, key, data, hash) VALUES ($1, $2, $3, $4)`
 	updateSecretQuery = `UPDATE secrets SET data = $1, hash = $2 WHERE username = $3 AND key = $4 AND hash = $5`
 	getSecretQuery    = `SELECT data, hash FROM secrets WHERE username = $1 AND key = $2`

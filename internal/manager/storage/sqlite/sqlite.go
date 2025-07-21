@@ -5,8 +5,14 @@ package sqlite
 import (
 	"context"
 	"database/sql"
+	"embed"
+	"errors"
 	"fmt"
+	"strings"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/nekr0z/gk/internal/hash"
@@ -17,13 +23,6 @@ import (
 const (
 	tableName = "secrets"
 
-	createTableQuery = `
-	CREATE TABLE IF NOT EXISTS ` + tableName + `(
-		id TEXT PRIMARY KEY,
-		encrypted_payload BLOB,
-		payload_hash BLOB,
-		server_hash BLOB
-	)`
 	selectQuery = `SELECT encrypted_payload, payload_hash, server_hash FROM ` + tableName + ` WHERE id = ?`
 	insertQuery = `INSERT INTO ` + tableName + `
 	(id, encrypted_payload, payload_hash, server_hash)
@@ -35,6 +34,9 @@ const (
 	deleteQuery = `DELETE FROM ` + tableName + ` WHERE id = ?`
 )
 
+//go:embed migrations/*.sql
+var fs embed.FS
+
 var _ storage.Storage = (*Storage)(nil)
 
 // Storage implements the storage.Storage interface using an SQL database.
@@ -45,21 +47,38 @@ type Storage struct {
 // New creates a new SQL storage instance using the provided DSN.
 // Secrets table is created if one doesn't exist.
 func New(dsn string) (*Storage, error) {
+	if err := runMigrations(dsn); err != nil {
+		return nil, err
+	}
+
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
-	if err := createTableIfNotExists(db); err != nil {
-		return nil, fmt.Errorf("failed to create table: %w", err)
-	}
-
 	return &Storage{db: db}, nil
 }
 
-func createTableIfNotExists(db *sql.DB) error {
-	_, err := db.Exec(createTableQuery)
-	return err
+func runMigrations(dsn string) error {
+	src, err := iofs.New(fs, "migrations")
+	if err != nil {
+		return err
+	}
+
+	dsn = strings.TrimPrefix(dsn, "file:")
+	dsn = fmt.Sprintf("sqlite3://%s", dsn)
+
+	m, err := migrate.NewWithSourceInstance("iofs", src, dsn)
+	if err != nil {
+		return err
+	}
+
+	err = m.Up()
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		return err
+	}
+
+	return nil
 }
 
 // Close closes the database connection.
