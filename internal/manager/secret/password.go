@@ -1,0 +1,53 @@
+package secret
+
+import (
+	"encoding/json"
+	"strings"
+)
+
+// Password is a plaintext secret value.
+type Password struct {
+	Username string `json:"u"`
+	Password string `json:"p"`
+}
+
+// NewPassword creates a new Password secret.
+func NewPassword(username, password string) Secret {
+	v := Password{
+		Username: username,
+		Password: password,
+	}
+	return Secret{
+		secret:   &v,
+		metadata: make(map[string]string),
+	}
+}
+
+// String returns the string representation of the Password.
+func (p Password) String() string {
+	var sb strings.Builder
+	sb.WriteString("Username: ")
+	sb.WriteString(p.Username)
+	sb.WriteString("\n")
+	sb.WriteString("Password: ")
+	sb.WriteString(p.Password)
+
+	return sb.String()
+}
+
+func (p Password) typeMarker() byte {
+	return 'p'
+}
+
+func (p Password) marshal() []byte {
+	b, err := json.Marshal(p)
+	if err != nil {
+		return nil
+	}
+
+	return b
+}
+
+func (p *Password) unmarshal(data []byte) error {
+	return json.Unmarshal(data, p)
+}

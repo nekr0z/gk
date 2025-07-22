@@ -1,0 +1,33 @@
+all: false
+dir: '{{.InterfaceDir}}'
+filename: mocks_test.go
+force-file-write: true
+formatter: goimports
+include-auto-generated: false
+log-level: info
+structname: '{{.Mock}}{{.InterfaceName}}'
+pkgname: '{{.SrcPackageName}}'
+recursive: false
+require-template-schema-exists: true
+template: testify
+template-schema: '{{.Template}}.schema.json'
+packages:
+  github.com/nekr0z/gk/internal/manager/storage:
+    interfaces:
+      Storage:
+      Remote:
+  github.com/nekr0z/gk/internal/server/grpc:
+    interfaces:
+      UserService:
+      SecretService:
+  github.com/nekr0z/gk/internal/server/secret:
+    interfaces:
+      SecretStorage:
+  github.com/nekr0z/gk/internal/server/user:
+    interfaces:
+      UserStorage:
+  github.com/nekr0z/gk/pkg/pb:
+    interfaces:
+      UserServiceClient:
+    config:
+      filename: mocks.go
